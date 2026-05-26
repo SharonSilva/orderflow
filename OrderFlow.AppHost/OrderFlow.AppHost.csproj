@@ -11,6 +11,8 @@
   <ItemGroup>
     <ProjectReference Include="..\OrderFlow.Web\OrderFlow.Web.csproj" />
     <ProjectReference Include="..\Orders.Api\Orders.Api.csproj" />
+    <ProjectReference Include="..\Inventory.Api\Inventory.Api.csproj" />
+    <ProjectReference Include="..\Payments.Api\Payments.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>
