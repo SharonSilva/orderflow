@@ -1,0 +1,20 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.3.5">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>9203d91d-b04d-4932-9b58-5405c4d1f27f</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OrderFlow.ApiService\OrderFlow.ApiService.csproj" />
+    <ProjectReference Include="..\OrderFlow.Web\OrderFlow.Web.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.Redis" Version="13.3.5" />
+  </ItemGroup>
+
+</Project>
