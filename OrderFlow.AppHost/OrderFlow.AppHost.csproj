@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OrderFlow.ApiService\OrderFlow.ApiService.csproj" />
     <ProjectReference Include="..\OrderFlow.Web\OrderFlow.Web.csproj" />
+    <ProjectReference Include="..\Orders.Api\Orders.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>
