@@ -18,7 +18,7 @@ var orders = builder.AddProject<Projects.Orders_Api>("orders")
     .WaitFor(ordersDb)
     .WithHttpHealthCheck("/health");
 
-var payments = builder.AddProject<Projects.Inventory_Api>("inventory")
+var inventory = builder.AddProject<Projects.Inventory_Api>("inventory")
     .WithReference(inventoryDb)
     .WaitFor(inventoryDb)
     .WithHttpHealthCheck("/health");
@@ -27,3 +27,13 @@ var payments = builder.AddProject<Projects.Payments_Api>("payments")
     .WithReference(paymentsDb)
     .WaitFor(paymentsDb)
     .WithHttpHealthCheck("/health");
+
+builder.AddProject<Projects.OrderFlow_Web>("webfrontend")
+    .WithExternalHttpEndpoints()
+    .WithHttpHealthCheck("/health")
+    .WithReference(cache)
+    .WaitFor(cache)
+    .WithReference(orders)
+    .WaitFor(orders);
+
+builder.Build().Run();
