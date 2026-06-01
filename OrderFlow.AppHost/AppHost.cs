@@ -13,6 +13,11 @@ var ordersDb = postgres.AddDatabase("orders-db");
 var inventoryDb = postgres.AddDatabase("inventory-db");
 var paymentsDb = postgres.AddDatabase("payments-db");
 
+//RabbitMQ message broker, with the management UI plugin enabled
+var rabbit = builder.AddRabbitMQ("rabbit")
+    .WithManagementPlugin()
+    .WithDataVolume();
+
 var orders = builder.AddProject<Projects.Orders_Api>("orders")
     .WithReference(ordersDb)
     .WaitFor(ordersDb)
