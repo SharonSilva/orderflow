@@ -12,3 +12,18 @@ var postgres = builder.AddPostgres("postgres")  //This adds a postgresSQL server
 var ordersDb = postgres.AddDatabase("orders-db");
 var inventoryDb = postgres.AddDatabase("inventory-db");
 var paymentsDb = postgres.AddDatabase("payments-db");
+
+var orders = builder.AddProject<Projects.Orders_Api>("orders")
+    .WithReference(ordersDb)
+    .WaitFor(ordersDb)
+    .WithHttpHealthCheck("/health");
+
+var payments = builder.AddProject<Projects.Inventory_Api>("inventory")
+    .WithReference(inventoryDb)
+    .WaitFor(inventoryDb)
+    .WithHttpHealthCheck("/health");
+
+var payments = builder.AddProject<Projects.Payments_Api>("payments")
+    .WithReference(paymentsDb)
+    .WaitFor(paymentsDb)
+    .WithHttpHealthCheck("/health");
