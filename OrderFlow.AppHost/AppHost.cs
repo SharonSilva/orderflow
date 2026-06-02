@@ -21,6 +21,8 @@ var rabbit = builder.AddRabbitMQ("rabbit")
 var orders = builder.AddProject<Projects.Orders_Api>("orders")
     .WithReference(ordersDb)
     .WaitFor(ordersDb)
+    .WithReference(rabbit)
+    .WaitFor(rabbit)
     .WithHttpHealthCheck("/health");
 
 var inventory = builder.AddProject<Projects.Inventory_Api>("inventory")

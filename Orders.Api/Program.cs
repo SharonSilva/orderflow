@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Orders.Api;
+using Wolverine;
+using Wolverine.RabbitMQ;
+using Wolverine.Postgresql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +11,18 @@ builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
 
 builder.AddNpgsqlDbContext<OrdersDbContext>("orders-db");
+
+builder.Host.UseWolverine(opts =>
+{
+    var rabbitConn = builder.Configuration.GetConnectionString("rabbit")!;
+    var dbConn = builder.Configuration.GetConnectionString("orders-db")!;
+
+    opts.UseRabbitMq(new Uri(rabbitConn))
+        .AutoProvision()
+        .UseConventionalRouting();
+
+    opts.PersistMessagesWithPostgresql(dbConn, "wolverine");
+});
 
 var app = builder.Build();
 
