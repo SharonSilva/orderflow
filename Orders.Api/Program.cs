@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Orders.Api;
 using Wolverine;
+using Wolverine.EntityFrameworkCore;
 using Wolverine.RabbitMQ;
 using Wolverine.Postgresql;
+using OrderFlow.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +24,7 @@ builder.Host.UseWolverine(opts =>
         .UseConventionalRouting();
 
     opts.PersistMessagesWithPostgresql(dbConn, "wolverine");
+    opts.UseEntityFrameworkCoreTransactions();
 });
 
 var app = builder.Build();
@@ -38,7 +41,10 @@ if (app.Environment.IsDevelopment())
 
 app.MapGet("/", () => "Orders.Api is running.");
 
-app.MapPost("/orders", async (CreateOrderRequest request, OrdersDbContext db) =>
+app.MapPost("/orders", async (
+    CreateOrderRequest request,
+    OrdersDbContext db,
+    IMessageBus bus) =>
 {
     var order = new Order
     {
@@ -50,6 +56,13 @@ app.MapPost("/orders", async (CreateOrderRequest request, OrdersDbContext db) =>
     };
 
     db.Orders.Add(order);
+    await bus.PublishAsync(new OrderPlaced(
+        order.Id,
+        order.CustomerId,
+        order.ProductId,
+        order.Quantity,
+        order.Amount   ));
+        
     await db.SaveChangesAsync();
 
     return Results.Created($"/orders/{order.Id}", order);
