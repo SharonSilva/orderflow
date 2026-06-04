@@ -28,6 +28,8 @@ var orders = builder.AddProject<Projects.Orders_Api>("orders")
 var inventory = builder.AddProject<Projects.Inventory_Api>("inventory")
     .WithReference(inventoryDb)
     .WaitFor(inventoryDb)
+    .WithReference(rabbit)
+    .WaitFor(rabbit)
     .WithHttpHealthCheck("/health");
 
 var payments = builder.AddProject<Projects.Payments_Api>("payments")

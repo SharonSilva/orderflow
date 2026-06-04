@@ -1,6 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Inventory.Api;
 using System.Data.Common;
+using Wolverine;
+using Wolverine.EntityFrameworkCore;
+using Wolverine.RabbitMQ;
+using Wolverine.Postgresql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +13,19 @@ builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
 
 builder.AddNpgsqlDbContext<InventoryDbContext>("inventory-db");
+
+builder.Host.UseWolverine(opts =>
+{
+    var rabbitConn = builder.Configuration.GetConnectionString("rabbit")!;
+    var dbConn = builder.Configuration.GetConnectionString("inventory-db")!;
+
+    opts.UseRabbitMq(new Uri(rabbitConn))
+        .AutoProvision()
+        .UseConventionalRouting();
+
+    opts.PersistMessagesWithPostgresql(dbConn, "wolverine");
+    opts.UseEntityFrameworkCoreTransactions();
+});
 
 var app = builder.Build();
 
