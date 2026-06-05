@@ -1,6 +1,10 @@
 using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
 using Payments.Api;
+using Wolverine;
+using Wolverine.EntityFrameworkCore;
+using Wolverine.RabbitMQ;
+using Wolverine.Postgresql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +15,21 @@ builder.Services.AddOpenApi();
 builder.AddNpgsqlDbContext<PaymentsDbContext>("payments-db");
 //Npgsql is the provider that lets ef core communicate with PostgreSQL
 //PostgreSQL is the database
+
+builder.Host.UseWolverine(opts =>
+{
+    var rabbitConn = builder.Configuration.GetConnectionString("rabbit")!;
+    var dbConn = builder.Configuration.GetConnectionString("payments-db")!;
+
+    opts.UseRabbitMq(new Uri(rabbitConn))
+        .AutoProvision()
+        .UseConventionalRouting();
+
+    opts.PersistMessagesWithPostgresql(dbConn, "wolverine");
+    opts.UseEntityFrameworkCoreTransactions();
+
+}
+);
 
 var app = builder.Build();  //Takes everything configured earlier and turnit into a running web application
 app.UseExceptionHandler();  //Adds a safety layer that catches unexpected errors

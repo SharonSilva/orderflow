@@ -35,6 +35,8 @@ var inventory = builder.AddProject<Projects.Inventory_Api>("inventory")
 var payments = builder.AddProject<Projects.Payments_Api>("payments")
     .WithReference(paymentsDb)
     .WaitFor(paymentsDb)
+    .WithReference(rabbit)
+    .WaitFor(rabbit)
     .WithHttpHealthCheck("/health");
 
 builder.AddProject<Projects.OrderFlow_Web>("webfrontend")
