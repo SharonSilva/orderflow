@@ -4,24 +4,23 @@ using Wolverine;
 
 namespace Orders.Api.Handlers;
 
-public static class StockReservedHandler
+public static class PaymentFailedHandler
 {
     public static async Task Handle(
-        StockReserved message,
+        PaymentFailed message,
         OrdersDbContext db,
-        IMessageBus bus
-    )
+        IMessageBus bus)
     {
         var order = await db.Orders
             .FirstOrDefaultAsync(o => o.Id == message.OrderId);
 
         if (order is null) return;
-        if(order.Status != OrderStatus.Pending) return;
+        if (order.Status != OrderStatus.Pending) return;
 
-        await bus.PublishAsync(new PaymentRequested(
+        await bus.PublishAsync(new ReleaseStock(
             order.Id,
-            order.Amount
-        ));
+            order.ProductId,
+            order.Quantity));
 
         await db.SaveChangesAsync();
     }

@@ -1,27 +1,21 @@
 using Microsoft.EntityFrameworkCore;
 using OrderFlow.Contracts;
-using Wolverine;
 
 namespace Orders.Api.Handlers;
 
-public static class StockReservedHandler
+public static class StockReleasedHandler
 {
     public static async Task Handle(
-        StockReserved message,
-        OrdersDbContext db,
-        IMessageBus bus
-    )
+        StockReleased message,
+        OrdersDbContext db)
     {
         var order = await db.Orders
             .FirstOrDefaultAsync(o => o.Id == message.OrderId);
 
         if (order is null) return;
-        if(order.Status != OrderStatus.Pending) return;
+        if (order.Status != OrderStatus.Pending) return;
 
-        await bus.PublishAsync(new PaymentRequested(
-            order.Id,
-            order.Amount
-        ));
+        order.Status = OrderStatus.Cancelled;
 
         await db.SaveChangesAsync();
     }
