@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a6c7d"/>
+    </marker>
+    <style>
+      .title { font-size: 22px; font-weight: 600; fill: #1a2332; }
+      .subtitle { font-size: 13px; fill: #5a6c7d; }
+      .label { font-size: 13px; font-weight: 500; fill: #1a2332; }
+      .sublabel { font-size: 11px; fill: #5a6c7d; }
+      .badge { font-size: 10px; font-weight: 600; fill: #5a6c7d; letter-spacing: 0.5px; }
+      .service-box { fill: #e8f1ff; stroke: #4a7fd9; stroke-width: 2; }
+      .db-box { fill: #fff4e6; stroke: #e08a3c; stroke-width: 2; }
+      .infra-box { fill: #f0e8ff; stroke: #8b5cf6; stroke-width: 2; }
+      .apphost-box { fill: none; stroke: #94a3b8; stroke-width: 1.5; stroke-dasharray: 6 3; }
+      .future-box { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.5; stroke-dasharray: 4 3; }
+      .future-label { font-size: 12px; fill: #94a3b8; font-style: italic; }
+      .arrow-line { fill: none; stroke: #5a6c7d; stroke-width: 1.5; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <text x="450" y="34" text-anchor="middle" class="title">Orchestrion — Architecture</text>
+  <text x="450" y="54" text-anchor="middle" class="subtitle">Three services, three databases, one message broker. Aspire orchestrates everything locally.</text>
+
+  <!-- Future / planned layer (greyed) -->
+  <rect x="280" y="80" width="340" height="60" rx="6" class="future-box"/>
+  <text x="450" y="105" text-anchor="middle" class="future-label">Angular SPA + YARP Gateway</text>
+  <text x="450" y="125" text-anchor="middle" class="future-label">(planned — Phases 4 &amp; 7+)</text>
+
+  <!-- AppHost dashed wrapper -->
+  <rect x="40" y="170" width="820" height="380" rx="10" class="apphost-box"/>
+  <text x="60" y="195" class="badge">ASPIRE APPHOST</text>
+
+  <!-- Three services row -->
+  <g>
+    <rect x="80" y="225" width="200" height="80" rx="8" class="service-box"/>
+    <text x="180" y="255" text-anchor="middle" class="label">Orders.Api</text>
+    <text x="180" y="275" text-anchor="middle" class="sublabel">Saga orchestrator</text>
+    <text x="180" y="291" text-anchor="middle" class="sublabel">Owns Order lifecycle</text>
+  </g>
+
+  <g>
+    <rect x="350" y="225" width="200" height="80" rx="8" class="service-box"/>
+    <text x="450" y="255" text-anchor="middle" class="label">Inventory.Api</text>
+    <text x="450" y="275" text-anchor="middle" class="sublabel">Reserves &amp; releases</text>
+    <text x="450" y="291" text-anchor="middle" class="sublabel">Owns StockItem</text>
+  </g>
+
+  <g>
+    <rect x="620" y="225" width="200" height="80" rx="8" class="service-box"/>
+    <text x="720" y="255" text-anchor="middle" class="label">Payments.Api</text>
+    <text x="720" y="275" text-anchor="middle" class="sublabel">Processes charges</text>
+    <text x="720" y="291" text-anchor="middle" class="sublabel">Owns Payment</text>
+  </g>
+
+  <!-- Service → DB arrows -->
+  <line x1="180" y1="305" x2="180" y2="365" class="arrow-line"/>
+  <line x1="450" y1="305" x2="450" y2="365" class="arrow-line"/>
+  <line x1="720" y1="305" x2="720" y2="365" class="arrow-line"/>
+
+  <!-- Databases row -->
+  <g>
+    <rect x="100" y="370" width="160" height="60" rx="8" class="db-box"/>
+    <text x="180" y="396" text-anchor="middle" class="label">orders-db</text>
+    <text x="180" y="414" text-anchor="middle" class="sublabel">PostgreSQL 17</text>
+  </g>
+
+  <g>
+    <rect x="370" y="370" width="160" height="60" rx="8" class="db-box"/>
+    <text x="450" y="396" text-anchor="middle" class="label">inventory-db</text>
+    <text x="450" y="414" text-anchor="middle" class="sublabel">PostgreSQL 17</text>
+  </g>
+
+  <g>
+    <rect x="640" y="370" width="160" height="60" rx="8" class="db-box"/>
+    <text x="720" y="396" text-anchor="middle" class="label">payments-db</text>
+    <text x="720" y="414" text-anchor="middle" class="sublabel">PostgreSQL 17</text>
+  </g>
+
+  <!-- RabbitMQ -->
+  <g>
+    <rect x="350" y="465" width="200" height="60" rx="8" class="infra-box"/>
+    <text x="450" y="490" text-anchor="middle" class="label">RabbitMQ</text>
+    <text x="450" y="508" text-anchor="middle" class="sublabel">Fanout exchanges, auto-provisioned</text>
+  </g>
+
+  <!-- Service → RabbitMQ arrows (bidirectional, simplified as plain lines) -->
+  <path d="M 180 305 Q 180 460 350 495" class="arrow-line"/>
+  <line x1="450" y1="305" x2="450" y2="465" class="arrow-line"/>
+  <path d="M 720 305 Q 720 460 550 495" class="arrow-line"/>
+
+  <!-- Legend -->
+  <g transform="translate(40, 575)">
+    <rect x="0" y="0" width="14" height="14" class="service-box"/>
+    <text x="20" y="11" class="sublabel">.NET 10 service</text>
+    <rect x="120" y="0" width="14" height="14" class="db-box"/>
+    <text x="140" y="11" class="sublabel">PostgreSQL database</text>
+    <rect x="260" y="0" width="14" height="14" class="infra-box"/>
+    <text x="280" y="11" class="sublabel">Message broker</text>
+    <text x="400" y="11" class="sublabel" font-style="italic">Each service connects only to its own database</text>
+  </g>
+</svg>

@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 780" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#10a25a"/>
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc6a3c"/>
+    </marker>
+    <marker id="arrowGrey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a6c7d"/>
+    </marker>
+    <style>
+      .title { font-size: 22px; font-weight: 600; fill: #1a2332; }
+      .subtitle { font-size: 13px; fill: #5a6c7d; }
+      .lifeline-box { fill: #e8f1ff; stroke: #4a7fd9; stroke-width: 2; }
+      .lifeline-label { font-size: 14px; font-weight: 600; fill: #1a2332; }
+      .lifeline-line { stroke: #cbd5e1; stroke-width: 1.5; stroke-dasharray: 4 4; }
+      .msg-label { font-size: 12px; fill: #1a2332; font-weight: 500; }
+      .msg-label-green { font-size: 12px; fill: #0a7a44; font-weight: 600; }
+      .msg-label-red { font-size: 12px; fill: #b85320; font-weight: 600; }
+      .happy-arrow { fill: none; stroke: #10a25a; stroke-width: 2; marker-end: url(#arrowGreen); }
+      .compensation-arrow { fill: none; stroke: #dc6a3c; stroke-width: 2; marker-end: url(#arrowRed); }
+      .external-arrow { fill: none; stroke: #5a6c7d; stroke-width: 1.5; marker-end: url(#arrowGrey); }
+      .state-box-confirmed { fill: #d4f4dd; stroke: #10a25a; stroke-width: 2; }
+      .state-box-cancelled { fill: #fde4d3; stroke: #dc6a3c; stroke-width: 2; }
+      .state-label { font-size: 13px; font-weight: 600; }
+      .step-num { font-size: 10px; font-weight: 700; fill: #94a3b8; }
+      .legend-text { font-size: 12px; fill: #5a6c7d; }
+      .divider { stroke: #e2e8f0; stroke-width: 1; stroke-dasharray: 3 3; }
+    </style>
+  </defs>
+
+  <text x="450" y="34" text-anchor="middle" class="title">Orchestrion — Saga Flow</text>
+  <text x="450" y="54" text-anchor="middle" class="subtitle">Happy path (green) and compensation path (orange). Time flows downward.</text>
+
+  <!-- Lifeline headers -->
+  <g>
+    <rect x="80" y="80" width="180" height="40" rx="6" class="lifeline-box"/>
+    <text x="170" y="106" text-anchor="middle" class="lifeline-label">Orders.Api</text>
+  </g>
+  <g>
+    <rect x="360" y="80" width="180" height="40" rx="6" class="lifeline-box"/>
+    <text x="450" y="106" text-anchor="middle" class="lifeline-label">Inventory.Api</text>
+  </g>
+  <g>
+    <rect x="640" y="80" width="180" height="40" rx="6" class="lifeline-box"/>
+    <text x="730" y="106" text-anchor="middle" class="lifeline-label">Payments.Api</text>
+  </g>
+
+  <!-- Lifeline vertical dashes -->
+  <line x1="170" y1="120" x2="170" y2="720" class="lifeline-line"/>
+  <line x1="450" y1="120" x2="450" y2="720" class="lifeline-line"/>
+  <line x1="730" y1="120" x2="730" y2="720" class="lifeline-line"/>
+
+  <!-- External: POST -->
+  <line x1="20" y1="155" x2="170" y2="155" class="external-arrow"/>
+  <text x="95" y="148" text-anchor="middle" class="msg-label">POST /orders</text>
+
+  <!-- Step 1: Orders → Inventory: OrderPlaced -->
+  <text x="60" y="200" class="step-num">1</text>
+  <line x1="170" y1="200" x2="450" y2="200" class="happy-arrow"/>
+  <text x="310" y="193" text-anchor="middle" class="msg-label-green">OrderPlaced</text>
+
+  <!-- Step 2: Inventory → Orders: StockReserved -->
+  <text x="60" y="245" class="step-num">2</text>
+  <line x1="450" y1="245" x2="170" y2="245" class="happy-arrow"/>
+  <text x="310" y="238" text-anchor="middle" class="msg-label-green">StockReserved</text>
+
+  <!-- Step 3: Orders → Payments: PaymentRequested -->
+  <text x="60" y="290" class="step-num">3</text>
+  <line x1="170" y1="290" x2="730" y2="290" class="happy-arrow"/>
+  <text x="450" y="283" text-anchor="middle" class="msg-label-green">PaymentRequested</text>
+
+  <!-- Branch divider -->
+  <line x1="40" y1="320" x2="860" y2="320" class="divider"/>
+  <text x="450" y="338" text-anchor="middle" class="subtitle" font-style="italic">Payments inspects the amount and branches</text>
+
+  <!-- Happy branch label -->
+  <text x="170" y="380" text-anchor="middle" class="msg-label-green">— Happy path —</text>
+  <text x="170" y="396" text-anchor="middle" class="legend-text">(amount has cents)</text>
+
+  <!-- Compensation branch label -->
+  <text x="730" y="380" text-anchor="middle" class="msg-label-red">— Compensation path —</text>
+  <text x="730" y="396" text-anchor="middle" class="legend-text">(whole-dollar amount)</text>
+
+  <!-- Step 4a (happy): Payments → Orders: PaymentSucceeded -->
+  <text x="60" y="430" class="step-num">4a</text>
+  <line x1="730" y1="430" x2="170" y2="430" class="happy-arrow"/>
+  <text x="450" y="423" text-anchor="middle" class="msg-label-green">PaymentSucceeded</text>
+
+  <!-- Step 5a (happy): Order → Confirmed -->
+  <g>
+    <rect x="80" y="455" width="180" height="40" rx="6" class="state-box-confirmed"/>
+    <text x="170" y="481" text-anchor="middle" class="state-label" fill="#0a7a44">Order → Confirmed</text>
+  </g>
+
+  <!-- Compensation flow (below the happy path) -->
+  <line x1="40" y1="520" x2="860" y2="520" class="divider"/>
+
+  <!-- Step 4b (compensation): Payments → Orders: PaymentFailed -->
+  <text x="60" y="555" class="step-num">4b</text>
+  <line x1="730" y1="555" x2="170" y2="555" class="compensation-arrow"/>
+  <text x="450" y="548" text-anchor="middle" class="msg-label-red">PaymentFailed</text>
+
+  <!-- Step 5b (compensation): Orders → Inventory: ReleaseStock -->
+  <text x="60" y="600" class="step-num">5b</text>
+  <line x1="170" y1="600" x2="450" y2="600" class="compensation-arrow"/>
+  <text x="310" y="593" text-anchor="middle" class="msg-label-red">ReleaseStock</text>
+
+  <!-- Step 6b (compensation): Inventory → Orders: StockReleased -->
+  <text x="60" y="645" class="step-num">6b</text>
+  <line x1="450" y1="645" x2="170" y2="645" class="compensation-arrow"/>
+  <text x="310" y="638" text-anchor="middle" class="msg-label-red">StockReleased</text>
+
+  <!-- Step 7b: Order → Cancelled -->
+  <g>
+    <rect x="80" y="670" width="180" height="40" rx="6" class="state-box-cancelled"/>
+    <text x="170" y="696" text-anchor="middle" class="state-label" fill="#b85320">Order → Cancelled</text>
+  </g>
+
+  <!-- Legend -->
+  <g transform="translate(40, 745)">
+    <line x1="0" y1="6" x2="30" y2="6" class="happy-arrow"/>
+    <text x="40" y="10" class="legend-text">Happy path event</text>
+    <line x1="180" y1="6" x2="210" y2="6" class="compensation-arrow"/>
+    <text x="220" y="10" class="legend-text">Compensating event</text>
+    <line x1="380" y1="6" x2="410" y2="6" class="external-arrow"/>
+    <text x="420" y="10" class="legend-text">External (HTTP) request</text>
+    <text x="600" y="10" class="legend-text" font-style="italic">Each arrow is a message via RabbitMQ outbox</text>
+  </g>
+</svg>
