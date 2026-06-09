@@ -13,6 +13,7 @@
     <ProjectReference Include="..\Orders.Api\Orders.Api.csproj" />
     <ProjectReference Include="..\Inventory.Api\Inventory.Api.csproj" />
     <ProjectReference Include="..\Payments.Api\Payments.Api.csproj" />
+    <ProjectReference Include="..\OrderFlow.Gateway\OrderFlow.Gateway.csproj" />
   </ItemGroup>
 
   <ItemGroup>

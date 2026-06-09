@@ -47,4 +47,10 @@ builder.AddProject<Projects.OrderFlow_Web>("webfrontend")
     .WithReference(orders)
     .WaitFor(orders);
 
+builder.AddProject<Projects.OrderFlow_Gateway>("gateway")
+    .WithReference(orders)
+    .WithReference(inventory)
+    .WithReference(payments);
+
+
 builder.Build().Run();
