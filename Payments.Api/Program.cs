@@ -47,11 +47,42 @@ app.MapGet("/", () => "Payments.Api is running.");
 
 //GET endpoint to retrieve all payments from the database
 //Uses EF Core to asynchronously fetch all Payment records
-app.MapGet("/payments", async (PaymentsDbContext db) => 
-    await db.Payments.ToListAsync());
+app.MapGet("/payments", async(Guid? orderId, PaymentsDbContext db) =>
+{
+    var query = db.Payments.AsQueryable();
+    if (orderId.HasValue)
+    {
+        query = query.Where(p=>p.OrderId == orderId.Value);
+    }
+    var payments = await query
+        .OrderByDescending(p => p.ProcessedAt)
+        .ToListAsync();
+    return payments.Select(p=>p.ToDto());
+});
+
+app.MapGet("/payments/{id:guid}", async (Guid id, PaymentsDbContext db) =>
+{
+    var payment = await db.Payments.FindAsync(id);
+    return payment is null ? Results.NotFound() : Results.Ok(payment.ToDto());
+});
 
 //Registers Aspire/standard default endpoints (like health checks, metrics, etc)
 app.MapDefaultEndpoints();
 
 //starts the web application and begins listening for HTTP requests
 app.Run();
+
+public record PaymentDto(
+    Guid Id,
+    Guid OrderId,
+    decimal Amount,
+    string Status,
+    DateTime ProcessedAt
+);
+
+internal static class PaymentMappings
+{
+    public static PaymentDto ToDto(this Payment p) =>
+        new(p.Id, p.OrderId, p.Amount, p.Status.ToString(), p.ProcessedAt);
+
+}
