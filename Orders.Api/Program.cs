@@ -39,9 +39,8 @@ if (app.Environment.IsDevelopment())
     db.Database.EnsureCreated();
 }
 
-app.MapGet("/", () => "Orders.Api is running.");
 
-app.MapPost("/orders", async (
+app.MapPost("/", async (
     CreateOrderRequest request,
     OrdersDbContext db,
     IMessageBus bus) =>
@@ -68,7 +67,7 @@ app.MapPost("/orders", async (
     return Results.Created($"/orders/{order.Id}", order.ToDto());
 });
 
-app.MapGet("/orders", async (string? customerId, OrdersDbContext db) =>
+app.MapGet("/", async (string? customerId, OrdersDbContext db) =>
 {
     var query = db.Orders.AsQueryable();
     if (!string.IsNullOrWhiteSpace(customerId))
@@ -81,7 +80,7 @@ app.MapGet("/orders", async (string? customerId, OrdersDbContext db) =>
     return orders.Select(o => o.ToDto());
 });
 
-app.MapGet("/orders/{id:guid}", async (Guid id, OrdersDbContext db) =>
+app.MapGet("/{id:guid}", async (Guid id, OrdersDbContext db) =>
 {
     var order = await db.Orders.FindAsync(id);
     return order is null ? Results.NotFound() : Results.Ok(order.ToDto());

@@ -43,11 +43,10 @@ if (app.Environment.IsDevelopment())        //am i running locally (development 
 }
 
 // Health check / basic endpoint to confirm the service is running
-app.MapGet("/", () => "Payments.Api is running.");
 
 //GET endpoint to retrieve all payments from the database
 //Uses EF Core to asynchronously fetch all Payment records
-app.MapGet("/payments", async(Guid? orderId, PaymentsDbContext db) =>
+app.MapGet("/", async(Guid? orderId, PaymentsDbContext db) =>
 {
     var query = db.Payments.AsQueryable();
     if (orderId.HasValue)
@@ -60,7 +59,7 @@ app.MapGet("/payments", async(Guid? orderId, PaymentsDbContext db) =>
     return payments.Select(p=>p.ToDto());
 });
 
-app.MapGet("/payments/{id:guid}", async (Guid id, PaymentsDbContext db) =>
+app.MapGet("/{id:guid}", async (Guid id, PaymentsDbContext db) =>
 {
     var payment = await db.Payments.FindAsync(id);
     return payment is null ? Results.NotFound() : Results.Ok(payment.ToDto());
