@@ -16,8 +16,12 @@ builder.AddNpgsqlDbContext<OrdersDbContext>("orders-db");
 
 builder.Host.UseWolverine(opts =>
 {
-    var rabbitConn = builder.Configuration.GetConnectionString("rabbit")!;
-    var dbConn = builder.Configuration.GetConnectionString("orders-db")!;
+    var rabbitConn = builder.Configuration.GetConnectionString("rabbit")
+        ?? throw new InvalidOperationException(
+            "Connection string 'rabbit' is not configured. Set ConnectionStrings__rabbit env var or appsettings.");
+    var dbConn = builder.Configuration.GetConnectionString("orders-db")
+        ?? throw new InvalidOperationException(
+            "Connection string 'orders-db' is not configured. Set ConnectionStrings__orders-db env var or appsettings.");
 
     opts.UseRabbitMq(new Uri(rabbitConn))
         .AutoProvision()
