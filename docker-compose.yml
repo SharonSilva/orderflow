@@ -1,0 +1,91 @@
+services:
+
+  rabbit:
+    image: rabbitmq:4.2-management
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: devpass
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbit-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  postgres:
+    image: postgres:17.6
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: devpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres-init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  orders:
+    image: orderflow-orders:dev
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__rabbit: amqp://guest:devpass@rabbit:5672/
+      ConnectionStrings__orders-db: Host=postgres;Port=5432;Database=orders-db;Username=postgres;Password=devpass
+    depends_on:
+      rabbit:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  inventory:
+    image: orderflow-inventory:dev
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__rabbit: amqp://guest:devpass@rabbit:5672/
+      ConnectionStrings__inventory-db: Host=postgres;Port=5432;Database=inventory-db;Username=postgres;Password=devpass
+    depends_on:
+      rabbit:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  payments:
+    image: orderflow-payments:dev
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__rabbit: amqp://guest:devpass@rabbit:5672/
+      ConnectionStrings__payments-db: Host=postgres;Port=5432;Database=payments-db;Username=postgres;Password=devpass
+    depends_on:
+      rabbit:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  gateway:
+    image: orderflow-gateway:dev
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_ENVIRONMENT: Development
+      ReverseProxy__Clusters__orders-cluster__Destinations__orders-1__Address: http://orders:8080/
+      ReverseProxy__Clusters__inventory-cluster__Destinations__inventory-1__Address: http://inventory:8080/
+      ReverseProxy__Clusters__payments-cluster__Destinations__payments-1__Address: http://payments:8080/
+    ports:
+      - "8080:8080"
+    depends_on:
+      - orders
+      - inventory
+      - payments
+
+volumes:
+  postgres-data:
+  rabbit-data:
