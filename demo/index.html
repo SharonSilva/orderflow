@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OrderFlow Live</title>
+  <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@8.0.0/dist/browser/signalr.min.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, system-ui, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+      color: #222;
+    }
+    h1 { margin-bottom: 8px; }
+    .subtitle { color: #666; margin-top: 0; }
+    .status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .status-connecting { background: #fff3cd; color: #856404; }
+    .status-connected  { background: #d4edda; color: #155724; }
+    .status-error      { background: #f8d7da; color: #721c24; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
+    }
+    th { background: #f6f6f6; font-weight: 600; }
+    .pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .pill-Confirmed { background: #d4edda; color: #155724; }
+    .pill-Cancelled { background: #f8d7da; color: #721c24; }
+    .pill-Pending   { background: #fff3cd; color: #856404; }
+    .empty { color: #888; font-style: italic; padding: 20px 0; }
+    code {
+      background: #f0f0f0;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <h1>OrderFlow Live</h1>
+  <p class="subtitle">Real-time order status updates via SignalR.</p>
+
+  <p>
+    Connection: <span id="conn-status" class="status status-connecting">connecting…</span>
+  </p>
+
+  <p>
+    Post an order to see it appear:
+    <code>curl -X POST 'http://localhost:8080/api/orders' -H "Content-Type: application/json" -d '{"customerId":"demo","productId":"prod-1","quantity":1,"amount":29.99}'</code>
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Status</th>
+        <th>Changed at</th>
+      </tr>
+    </thead>
+    <tbody id="events">
+      <tr><td colspan="3" class="empty">No events yet. Post an order to see updates here.</td></tr>
+    </tbody>
+  </table>
+
+  <script>
+    const statusEl = document.getElementById('conn-status');
+    const tbody = document.getElementById('events');
+    let hasEvents = false;
+
+    function setStatus(text, cls) {
+      statusEl.textContent = text;
+      statusEl.className = `status status-${cls}`;
+    }
+
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl("http://localhost:8080/hubs/orders")
+      .withAutomaticReconnect()
+      .build();
+
+    connection.on("OrderStatusChanged", (msg) => {
+      if (!hasEvents) {
+        tbody.innerHTML = '';
+        hasEvents = true;
+      }
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td><code>${msg.orderId}</code></td>
+        <td><span class="pill pill-${msg.status}">${msg.status}</span></td>
+        <td>${new Date(msg.changedAt).toLocaleTimeString()}</td>
+      `;
+      tbody.prepend(row);
+    });
+
+    connection.onreconnecting(() => setStatus('reconnecting…', 'connecting'));
+    connection.onreconnected(() => setStatus('connected', 'connected'));
+    connection.onclose(() => setStatus('disconnected', 'error'));
+
+    connection.start()
+      .then(() => setStatus('connected', 'connected'))
+      .catch(err => {
+        setStatus('connection failed', 'error');
+        console.error('SignalR connection error:', err);
+      });
+  </script>
+</body>
+</html>

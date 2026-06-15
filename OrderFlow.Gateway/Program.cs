@@ -10,6 +10,9 @@ builder.Services
 
 var app = builder.Build();
 
+//Enable WebSocket support so YARP can proxy upgrade  through to backends
+app.UseWebSockets();
+
 // Standard /health and /alive endpoints from ServiceDefaults.
 app.MapDefaultEndpoints();
 

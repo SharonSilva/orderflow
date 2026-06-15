@@ -11,6 +11,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
+builder.Services.AddSignalR();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowDemoClient", policy =>
+    {
+        policy.WithOrigins("http://localhost:8000", "http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 
 builder.AddNpgsqlDbContext<OrdersDbContext>("orders-db");
 
@@ -34,6 +46,8 @@ builder.Host.UseWolverine(opts =>
 var app = builder.Build();
 
 app.UseExceptionHandler();
+app.UseCors("AllowDemoClient");
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -88,7 +102,11 @@ app.MapGet("/{id:guid}", async (Guid id, OrdersDbContext db) =>
 {
     var order = await db.Orders.FindAsync(id);
     return order is null ? Results.NotFound() : Results.Ok(order.ToDto());
-});
+}
+
+);
+
+app.MapHub<OrderHub>("/hubs/orders");
 
 app.MapDefaultEndpoints();
 
