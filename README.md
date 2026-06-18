@@ -135,3 +135,11 @@ Honest scoping — things deliberately left out:
 ## Acknowledgements
 
 Built as a portfolio piece to learn and demonstrate distributed systems patterns in the .NET ecosystem. Wolverine outbox and saga support, plus Aspire local orchestration, did the heavy lifting.
+
+## Known issue: Orders Docker image rebuild
+
+The Orders.Api image build occasionally produces a stale binary that doesn't include the SignalR broadcast code, even after `--no-cache` rebuilds. The source code and `dotnet build` produce a correct binary; the issue is isolated to Docker image production on macOS+OrbStack.
+
+Workaround for local development of the SignalR feature: run Orders.Api directly with `dotnet run` and connect the demo page to `http://localhost:5460/hubs/orders`. Other services continue running in docker-compose.
+
+Investigation pending — likely a BuildKit cache invalidation issue with Apple Silicon.
