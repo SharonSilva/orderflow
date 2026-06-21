@@ -1,0 +1,66 @@
+<div class="space-y-6">
+  <div class="flex items-end justify-between">
+    <div>
+      <h2 class="text-xl font-semibold text-slate-900">Orders</h2>
+      <p class="text-sm text-slate-500">Live status updates from the Orders service via SignalR.</p>
+    </div>
+    <div class="text-xs font-medium px-2.5 py-1 rounded-full border"
+         [class]="connectionPill().classes">
+      {{ connectionPill().label }}
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="text-sm text-slate-500">Loading orders…</div>
+  }
+
+  @if (error()) {
+    <div class="rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+      {{ error() }}
+    </div>
+  }
+
+  @if (!loading() && !error() && orders().length === 0) {
+    <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 text-sm text-slate-600">
+      No orders yet. Post one from a terminal — orders will appear here in real time.
+    </div>
+  }
+
+  @if (!loading() && orders().length > 0) {
+    <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <tr>
+            <th class="px-4 py-3">Order ID</th>
+            <th class="px-4 py-3">Customer</th>
+            <th class="px-4 py-3">Product</th>
+            <th class="px-4 py-3 text-right">Qty</th>
+            <th class="px-4 py-3 text-right">Amount</th>
+            <th class="px-4 py-3">Status</th>
+            <th class="px-4 py-3">Created</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          @for (order of orders(); track order.id) {
+            <tr class="hover:bg-slate-50">
+              <td class="px-4 py-3 font-mono text-xs text-slate-700">{{ order.id.slice(0, 8) }}…</td>
+              <td class="px-4 py-3 text-slate-700">{{ order.customerId }}</td>
+              <td class="px-4 py-3 text-slate-700">{{ order.productId }}</td>
+              <td class="px-4 py-3 text-right tabular-nums text-slate-700">{{ order.quantity }}</td>
+              <td class="px-4 py-3 text-right tabular-nums text-slate-700">${{ order.amount.toFixed(2) }}</td>
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                      [class]="statusClasses(order.status)">
+                  {{ order.status }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-xs text-slate-500">
+                {{ order.createdAt | date:'short' }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

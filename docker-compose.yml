@@ -76,7 +76,7 @@ services:
     environment:
       ASPNETCORE_URLS: http://+:8080
       ASPNETCORE_ENVIRONMENT: Development
-      ReverseProxy__Clusters__orders-cluster__Destinations__orders-1__Address: http://orders:8080/
+      ReverseProxy__Clusters__orders-cluster__Destinations__orders-1__Address: http://host.docker.internal:5460/
       ReverseProxy__Clusters__inventory-cluster__Destinations__inventory-1__Address: http://inventory:8080/
       ReverseProxy__Clusters__payments-cluster__Destinations__payments-1__Address: http://payments:8080/
     ports:

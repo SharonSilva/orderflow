@@ -37,3 +37,10 @@ export interface PaymentDto {
   status: 'Pending' | 'Succeeded' | 'Failed';
   processedAt: string;
 }
+// SignalR event payload — broadcast by Orders.Api when an order's status changes.
+// See Orders.Api/Handlers/PaymentSucceededHandler.cs and StockReleasedHandler.cs.
+export interface OrderStatusChange {
+  orderId: string;
+  status: 'Confirmed' | 'Cancelled';
+  changedAt: string;  // ISO timestamp
+}
